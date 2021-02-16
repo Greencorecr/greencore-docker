@@ -34,8 +34,6 @@ RUN cd /opt && \
     make install
 
 RUN strip /usr/local/modsecurity/bin/* /usr/local/modsecurity/lib/*.a /usr/local/modsecurity/lib/*.so*
-
-
 FROM ubuntu:20.04 AS nginx-build
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -68,6 +66,7 @@ RUN cd /opt && \
 git clone --recursive https://github.com/google/ngx_brotli.git
 
 COPY --from=modsecurity-build /usr/local/modsecurity/ /usr/local/modsecurity/
+COPY --from=modsecurity-build /opt/ModSecurity/unicode.mapping /etc/nginx/modsecurity.d/unicode.mapping
 
 RUN wget -q -P /opt https://nginx.org/download/nginx-"$NGINX_VERSION".tar.gz
 RUN tar xvzf /opt/nginx-"$NGINX_VERSION".tar.gz -C /opt
@@ -163,7 +162,6 @@ RUN echo "include /etc/nginx/modsecurity.d/modsecurity.conf" > /etc/nginx/modsec
 COPY --from=modsecurity-build /opt/ModSecurity/modsecurity.conf-recommended /etc/nginx/modsecurity.d
 RUN cd /etc/nginx/modsecurity.d && \
     mv modsecurity.conf-recommended modsecurity.conf
-
 ## Version for ModSecurity Core Rule Set
 ARG VERSION=3.3.0
 
@@ -174,7 +172,6 @@ RUN apt-get update && apt-get install curl -y && apt-get clean
 RUN curl -s https://codeload.github.com/coreruleset/coreruleset/tar.gz/v${VERSION} --output ~/modsec.tar.gz
 RUN tar xzf ~/modsec.tar.gz -C /etc/nginx
 RUN rm ~/modsec.tar.gz
-RUN ls /etc/nginx
 
 ## Install ModSecurity CRS
 RUN cat /etc/nginx/coreruleset-${VERSION}/crs-setup.conf.example /etc/nginx/coreruleset-${VERSION}/rules/*.conf >> /etc/nginx/modsecurity.d/crs.conf
