@@ -15,7 +15,11 @@ jobs:
     - uses: actions/checkout@v2.2.0
       with:
         fetch-depth: 0
-    - name: Alfresco install
+    - name: Build nginx_modsecurity
       run: |
         ( cd nginx_modsecurity
+        docker build . )
+    - name: Build alfresco
+      run: |
+        ( cd alfresco/alfresco
         docker build . )
