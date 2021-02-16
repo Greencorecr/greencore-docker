@@ -151,6 +151,7 @@ COPY --from=nginx-build /etc/nginx /etc/nginx
 
 COPY --from=nginx-build /usr/local/nginx/html /usr/local/nginx/html
 
+
 # NGiNX Create log dirs
 RUN mkdir -p /var/log/nginx/
 RUN touch /var/log/nginx/access.log
@@ -172,6 +173,7 @@ RUN apt-get update && apt-get install curl -y && apt-get clean
 RUN curl -s https://codeload.github.com/coreruleset/coreruleset/tar.gz/v${VERSION} --output ~/modsec.tar.gz
 RUN tar xzf ~/modsec.tar.gz -C /etc/nginx
 RUN rm ~/modsec.tar.gz
+RUN curl -o /etc/nginx/nginx.conf https://raw.githubusercontent.com/fede2cr/alfresco-ubuntu-install/master/nginx/nginx.conf
 
 ## Install ModSecurity CRS
 RUN cat /etc/nginx/coreruleset-${VERSION}/crs-setup.conf.example /etc/nginx/coreruleset-${VERSION}/rules/*.conf >> /etc/nginx/modsecurity.d/crs.conf
